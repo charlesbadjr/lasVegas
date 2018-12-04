@@ -6,8 +6,8 @@ class NoMatch extends Component {
   render() {
     return (
       <Header as="h1" textAlign="center">
-        Page Not Found
-        <Link to="/"> Home</Link>
+        You Shouldn't Be Here.
+        <Link to="/"> Return Home</Link>
       </Header>
     );
   }
