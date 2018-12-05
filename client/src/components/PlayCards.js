@@ -12,7 +12,11 @@ class PlayCards extends Component {
     constructor(props) {
         super(props);
         this.baseUrl = "https://deckofcardsapi.com/api/deck/";
-        this.state = { deckCards: [] };
+        this.state = { deckCards: [], deckId: '', dealerCards: [], playerCards: [], initial: true };
+      }
+
+      componentDidMount() {
+          this.generateDeck()
       }
 
       // https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=6
@@ -21,14 +25,57 @@ class PlayCards extends Component {
 
  // Get Shuffled deck with Deck ID
 
- getCards() {
+ generateDeck = () => {
      $.ajax({
          url: `${this.baseUrl}new/shuffle/?deck_count=6`,
          type: 'GET'
-     }).done( deckCards => {
-         this.setState({ deckCards: [] });
+     }).done( async res => {
+         this.setState({ deckId: res.deck_id, dealerCards: [], playerCards: [] }, () => {
+             const dealerCards = this.getCards('dealerCards')
+             const playererCards = this.getCards('playerCards')
+         });
 
      })
+    }
+
+    getCards = (who, cards = 2) => {
+        $.ajax({
+            type: 'GET',
+            url: `${this.baseUrl}${this.state.deckId}/draw/?count=${cards}`
+        }).done( res => {
+            const personCards = this.state[who]
+            this.setState({ [who]: [...personCards, ...res.cards] })
+        })
+    }
+
+    getValue = (card) => {
+        let value = parseInt(card)
+        if (isNaN(value)) {
+          switch(card) {
+              case 'JACK':
+              case 'QUEEN':
+              case 'KING':
+                return 10
+              default:
+                return 1
+          }
+        } else {
+            return value
+        }
+    }
+
+    addCards = () => {
+        const { playerCards } = this.state
+        const total = playerCards.reduce( (total, card)  =>  {
+            return total + this.getValue(card.value) 
+        }, 0)
+        return total < 21
+    }
+
+    hit = () => {
+      // Logic can you hit or not hit 
+      if (this.addCards())
+        this.getCards('playerCards', 1)
     }
 
 
@@ -43,6 +90,7 @@ class PlayCards extends Component {
  
 
     render() {
+        const { dealerCards, playerCards } = this.state
         return (
           <div className="blackJackTable">
             <Header> Black Jack </Header>
@@ -65,14 +113,8 @@ class PlayCards extends Component {
                  </Card.Content>
              </Card>
              
-             <Card.Group itemsPerRow={6}>
-                <Card raised image={KingHearts} alt="card1" />
-                <Card raised image={KingHearts} alt="card2"/>
-                <Card raised image={KingHearts} alt="card3"/>
-                <Card raised image={KingHearts} alt="card4"/>
-                <Card raised image={KingHearts} alt="card5"/>
-                <Card raised image={KingHearts} alt="card6"/>
-                
+             <Card.Group itemsPerRow={8}>
+               { dealerCards.map( (card, i) => <Card key={i} raised image={card.image} alt={`card${i}`} id={`DealerCard${i}`}/> )}
              </Card.Group>
             </div>
 
@@ -95,20 +137,13 @@ class PlayCards extends Component {
                   </a>
                  </Card.Content>
              </Card>
-             <Card.Group itemsPerRow={6}>
-                <Card raised image={KingHearts} alt="card1" />
-                <Card raised image={KingHearts} alt="card2"/>
-                <Card raised image={KingHearts} alt="card3"/>
-                <Card raised image={KingHearts} alt="card4"/>
-                <Card raised image={KingHearts} alt="card5"/>
-                <Card raised image={KingHearts} alt="card6"/>
-                
+             <Card.Group itemsPerRow={8}>
+             { playerCards.map( (card, i) => <Card key={i} raised image={card.image} alt={`card${i}`} id={`DealerCard${i}`}/> )}
              </Card.Group>
             </div>
             <div className="Buttons">
-               <Button color="red" onClick={this.getCards}> Get New Deck </Button>
-               <a> {this.getCards}</a>
-               <Button color="yellow" onClick={this.drawCard}> Hit Me </Button>
+               <Button color="red" onClick={this.generateDeck}> Get New Deck </Button>
+               <Button color="yellow" onClick={this.hit}> Hit Me </Button>
                <a> {this.drawCard} </a>
                <Button color="green" onClick={this.dealCards}> Deal Game </Button>
                <a> {this.dealCards} </a>
