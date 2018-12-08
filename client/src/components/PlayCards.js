@@ -4,7 +4,6 @@ import { Header,
     Icon, 
     Image, 
     Button } from 'semantic-ui-react';
-import KingHearts from './Styles/KingHearts.png'
 import $ from 'jquery';
 
 
@@ -12,16 +11,23 @@ class PlayCards extends Component {
     constructor(props) {
         super(props);
         this.baseUrl = "https://deckofcardsapi.com/api/deck/";
-        this.state = { deckCards: [], deckId: '', dealerCards: [], playerCards: [], initial: true };
+        this.state = { dealerDescript: [], deckCards: [], deckId: '', dealerCards: [], playerCards: [], initial: true };
       }
 
       componentDidMount() {
           this.generateDeck()
+          this.dealerTagLine()
       }
 
-      // https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=6
-      // https://deckofcardsapi.com/api/deck/<<deck_id>>/draw/?count=2
-// need to set variables. KG = King of Hearts
+    // description for dealer
+    dealerTagLine = () => {
+    $.ajax({
+        url: "https://geek-jokes.sameerkumar.website/api",
+        type: 'GET'
+    }).done( res => {
+        this.setState({ dealerDescript: res.message })
+    })
+}
 
  // Get Shuffled deck with Deck ID
 
@@ -38,6 +44,7 @@ class PlayCards extends Component {
      })
     }
 
+    // grabs 2 cards by default assigns them to personCards 
     getCards = (who, cards = 2) => {
         $.ajax({
             type: 'GET',
@@ -47,6 +54,8 @@ class PlayCards extends Component {
             this.setState({ [who]: [...personCards, ...res.cards] })
         })
     }
+
+    // Assigns value of Face cars Ace is 1
 
     getValue = (card) => {
         let value = parseInt(card)
@@ -64,6 +73,15 @@ class PlayCards extends Component {
         }
     }
 
+    dealerAddCards = () => {
+        const { playerCards } = this.state
+        const total = playerCards.reduce( (total, card)  =>  {
+            return total + this.getValue(card.value) 
+        }, 0)
+        return total < 17
+    }
+
+
     addCards = () => {
         const { playerCards } = this.state
         const total = playerCards.reduce( (total, card)  =>  {
@@ -72,20 +90,31 @@ class PlayCards extends Component {
         return total < 21
     }
 
-    hit = () => {
-      // Logic can you hit or not hit 
+    // Logic can you hit or not hit 
+
+    hit = () => {  
       if (this.addCards())
         this.getCards('playerCards', 1)
     }
-
-
- // deal cards evenly to players
  
  
 
- // draw card 1 card 
+ // Have dealer draw 1 card
 
 
+ 
+ // Dealer score is under 17 
+ dealerHit = () => {
+
+
+ }
+
+ // Who won? dealer score is 17 or over.
+ whoWonGame = () => {
+ 
+ }
+
+ 
 // for card counting need to set Value to cards, Set overal Score.
  
 
@@ -102,7 +131,7 @@ class PlayCards extends Component {
                    <Card.Meta>
                       <span className='Suit'> Black Jack Dealer </span>
                    </Card.Meta>
-                   <Card.Description> I like counting cards too bastard     </Card.Description>
+                   <Card.Description> {this.dealerDescript}  </Card.Description>
                 </Card.Content>
                 
                  <Card.Content extra>
@@ -138,15 +167,18 @@ class PlayCards extends Component {
                  </Card.Content>
              </Card>
              <Card.Group itemsPerRow={8}>
-             { playerCards.map( (card, i) => <Card key={i} raised image={card.image} alt={`card${i}`} id={`DealerCard${i}`}/> )}
+             { playerCards.map( (card, i) => <Card key={i} raised image={card.image} alt={`card${i}`} id={`playerCards${i}`}/> )}
              </Card.Group>
             </div>
             <div className="Buttons">
                <Button color="red" onClick={this.generateDeck}> Get New Deck </Button>
                <Button color="yellow" onClick={this.hit}> Hit Me </Button>
-               <a> {this.drawCard} </a>
+               <Button color="Blue" onClick={this.holdCards}> Hold </Button>
                <Button color="green" onClick={this.dealCards}> Deal Game </Button>
-               <a> {this.dealCards} </a>
+              
+            </div>
+            <div>
+                
             </div>
           </div>
         );
