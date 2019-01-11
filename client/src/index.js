@@ -8,6 +8,7 @@ import store from './store';
 import 'semantic-ui-css/semantic.min.css';
 import { initMiddleware } from 'devise-axios';
 import ScrollToTop from './components/ScrollToTop';
+import './components/Styles/Files.css';
 
 
 initMiddleware()

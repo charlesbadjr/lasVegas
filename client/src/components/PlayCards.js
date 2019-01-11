@@ -5,13 +5,16 @@ import { Header,
     Image, 
     Button } from 'semantic-ui-react';
 import $ from 'jquery';
+import { Home } from './Home';
 
 
 class PlayCards extends Component {
     constructor(props) {
         super(props);
         this.baseUrl = "https://deckofcardsapi.com/api/deck/";
-        this.state = { dealerDescript: [], deckCards: [], deckId: '', dealerCards: [], playerCards: [], initial: true };
+        this.state = { dealerDescript: '', deckCards: [], deckId: '',
+         dealerCards: [], playerCards: [], initial: true, 
+         firstName: '', tagLine:'', wins: [], random: '' };
       }
 
       componentDidMount() {
@@ -20,14 +23,24 @@ class PlayCards extends Component {
       }
 
     // description for dealer
-    dealerTagLine = () => {
+ dealerTagLine = () => {
     $.ajax({
         url: "https://geek-jokes.sameerkumar.website/api",
         type: 'GET'
     }).done( res => {
-        this.setState({ dealerDescript: res.message })
+        this.setState({ dealerDescript: res })
     })
 }
+
+
+ dealerImage = (random) => {
+     const min = 1;
+     const max = 100;
+     const rand = min + Math.random() * (max - min);
+     this.setState({ random: this.state.random + rand });
+     console.log(random);
+     
+ }
 
  // Get Shuffled deck with Deck ID
 
@@ -38,7 +51,7 @@ class PlayCards extends Component {
      }).done( async res => {
          this.setState({ deckId: res.deck_id, dealerCards: [], playerCards: [] }, () => {
              const dealerCards = this.getCards('dealerCards')
-             const playererCards = this.getCards('playerCards')
+             const playerCards = this.getCards('playerCards')
          });
 
      })
@@ -90,6 +103,17 @@ class PlayCards extends Component {
         return total < 21
     }
 
+// Adds 1 card to dealer's deck
+// grey out Hit me once hold is pressed. 
+    addDCards = () => {
+        const { dealerCards } = this.state
+        const total = dealerCards.reduce( (total, card)  =>  {
+            return total + this.getValue(card.value) 
+        }, 0)
+        return total < 17
+    }
+
+
     // Logic can you hit or not hit 
 
     hit = () => {  
@@ -100,18 +124,26 @@ class PlayCards extends Component {
  
 
  // Have dealer draw 1 card
-
+ dealerGetCard = () => {  
+    if (this.addDCards())
+      this.getCards('dealerCards', 1)
+  }
+ 
 
  
- // Dealer score is under 17 
+ // Dealer score is under 17 ?
  dealerHit = () => {
 
 
  }
 
+ // Uncover thefirst Dealer Card
+
+
  // Who won? dealer score is 17 or over.
- whoWonGame = () => {
- 
+ whoWonGame = (wins = 1 ) => {
+    const playerWins = this.state[wins]
+    this.setState({ [wins]: [...playerWins, playerWins] })
  }
 
  
@@ -119,68 +151,81 @@ class PlayCards extends Component {
  
 
     render() {
-        const { dealerCards, playerCards } = this.state
+        
+        const { dealerDescript, dealerCards, playerCards, firstName, tagLine, playerWins, dealerWins, random } = this.state
         return (
-          <div className="blackJackTable">
-            <Header> Black Jack </Header>
-            <div className="Dealer">
-            <Card>
-                <Image src='https://react.semantic-ui.com/images/avatar/large/matthew.png' />
-                <Card.Content>
-                   <Card.Header>Matthew</Card.Header>
-                   <Card.Meta>
-                      <span className='Suit'> Black Jack Dealer </span>
-                   </Card.Meta>
-                   <Card.Description> {this.dealerDescript}  </Card.Description>
-                </Card.Content>
-                
-                 <Card.Content extra>
-                  <a>
-                    <Icon name='user' />
-                             55 Wins
-                  </a>
-                 </Card.Content>
-             </Card>
-             
-             <Card.Group itemsPerRow={8}>
-               { dealerCards.map( (card, i) => <Card key={i} raised image={card.image} alt={`card${i}`} id={`DealerCard${i}`}/> )}
-             </Card.Group>
-            </div>
+  <div className="blackJackTable">
+            <Header as="h1" style={{color: "white" }}> Black Jack </Header>
+     <div className="layOut">
 
-
-            <div className="PlayerOne" >
-            <Card>
-                <Image src='https://react.semantic-ui.com/images/avatar/large/matthew.png' />
-                <Card.Content>
-                   <Card.Header>Charlie</Card.Header>
-                   <Card.Meta>
-                      <span className='Suit'> Black Jack Player </span>
-                   </Card.Meta>
-                   <Card.Description> Lover in the day, Card counter in the night </Card.Description>
-                </Card.Content>
-                
-                 <Card.Content extra>
-                  <a>
-                    <Icon name='user' />
-                             22 Wins
-                  </a>
-                 </Card.Content>
-             </Card>
-             <Card.Group itemsPerRow={8}>
-             { playerCards.map( (card, i) => <Card key={i} raised image={card.image} alt={`card${i}`} id={`playerCards${i}`}/> )}
-             </Card.Group>
-            </div>
-            <div className="Buttons">
-               <Button color="red" onClick={this.generateDeck}> Get New Deck </Button>
-               <Button color="yellow" onClick={this.hit}> Hit Me </Button>
-               <Button color="Blue" onClick={this.holdCards}> Hold </Button>
-               <Button color="green" onClick={this.dealCards}> Deal Game </Button>
+         <div className="playerContainer">
               
-            </div>
-            <div>
-                
-            </div>
+               <div className="Dealer">
+                  <Card className="dCardImage">
+                     <Image src='https://react.semantic-ui.com/images/avatar/large/jenny.jpg' />
+                     <Card.Content>
+                       <Card.Header> Jenny </Card.Header>
+                       <Card.Meta>
+                           <span className='Suit'> Black Jack Dealer </span>
+                       </Card.Meta>
+                       <Card.Description> {dealerDescript}  </Card.Description>
+                     </Card.Content>
+                     <Card.Content extra>
+                        <a>
+                           <Icon name='user' />
+                             {dealerWins} Wins
+                        </a>
+                    </Card.Content>
+                  </Card>
+               </div>
+
+
+               <div className="PlayerOne" >
+                 <Card className="pCardImage">
+                     <Image src='https://react.semantic-ui.com/images/avatar/large/matthew.png' />
+                     <Card.Content>
+                      <Card.Header>{firstName}</Card.Header>
+                       <Card.Meta>
+                          <span className='Suit'> Black Jack Player</span>
+                       </Card.Meta>
+                          <Card.Description> {tagLine} </Card.Description>
+                      </Card.Content>
+                      <Card.Content extra>
+                          <a>
+                           <Icon name='user' />
+                              {playerWins} Wins
+                           </a>
+                       </Card.Content>
+                   </Card>
+               </div >
+         </div>
+
+         <div className="playingCardsContainer"> 
+              <div className="playingCards">
+              
+                 <Card.Group itemsPerRow={4}>
+                    { dealerCards.map( (card, i) => <Card key={i} raised image={card.image} alt={`card${i}`} id={`DealerCard${i}`}/> )}
+                  </Card.Group>
+
+                  <Card.Group itemsPerRow={4} >
+                    { playerCards.map( (card, i) => <Card key={i} raised image={card.image} alt={`card${i}`} id={`playerCards${i}`}/> )}
+                  </Card.Group> 
+
+              </div>
           </div>
+
+          <div className="buttonsContainer">
+             <div className="Buttons">
+                 <Button color="red" onClick={this.generateDeck}> Get New Deck </Button>
+                 <Button color="yellow" onClick={this.hit}> Hit Me </Button>
+                 <Button color="blue" onClick={this.dealerGetCard}> Hold </Button>
+                 <Button color="green" onClick={this.dealCards}> Deal Game </Button> 
+             </div> 
+          </div>
+
+      </div>    
+ </div>
+        
         );
     }
 }

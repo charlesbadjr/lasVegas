@@ -29,7 +29,7 @@ class NavBar extends Component {
 
   render() {
     return (
-      <div>
+      <div className="navBar" >
         <Menu pointing secondary>
           <Link to="/">
             <Menu.Item name="home" />

@@ -5,43 +5,49 @@ import { Link } from 'react-router-dom';
 
 
 class Home extends Component {
+ state = {firstName: '', tagLine: '' };
 
   handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, firstName, tagLine } = e.target;
     this.setState({ [name]: value });
   }
 
   handleSubmit = (event) => {
     event.preventDefault();
-    const { dispatch, history } = this.props;
+    const { dispatch, history, firstName, tagLine } = this.props;
     dispatch(handleLogin(this.state, history));
   }
 
 
-  render() {
+  render() {  
+    const {firstName, tagLine } = this.state;
     return (
       <div className="homeScreen" >
-         <Header as="h1" textAlign="center"> The Vegas Experience </Header>
+         <Header as="h1" style={{ color: 'white', textAlign: 'center' }} > The Vegas Experience </Header>
          <div >
-           <Form>
+           <Form className="homeForm" >
              <Form.Field>
-               <label> what's your name? </label>
+               <label htmlfor="text" style={{ color: 'white', textAlign: 'left' }}> what's your name? </label>
                  <input 
                     required
-                    name='firstname' 
+                    name='firstName' 
                     placeholder='Your Name'
+                    value={firstName}
                     onChange={this.handleChange} />
-                    <label> Introduce yourself </label >
+                  </Form.Field>
+                  <Form.Field>
+                    <label as="h1" style={{ color: 'white', textAlign: 'left' }}> Introduce yourself </label >
                     <input 
                         required
-                        name='description' 
-                        placeholder='tagline' 
+                        name='tagLine' 
+                        value={tagLine}
+                        placeholder=' your tagline' 
                         onChange={this.handleChange}/>
-             </Form.Field>
-           </Form>
+                  </Form.Field>
            <Link to="./PlayCards">
-             <Button color="blue" icon="play" > Let's Play </Button>
+             <Button color="blue" icon="play" as="h1" > Let's Play </Button>
            </Link> 
+           </Form>
          </div>
       </div>
     );

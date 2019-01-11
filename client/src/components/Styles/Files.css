@@ -1,7 +1,96 @@
 .homeScreen {
-background-color: black;
-text-align: center;
+	background-image: url("./Home_lasVegas.jpeg");
+	height: 600px;
+	width: 100%;
+    background-size: cover;
+    font-size: 2em;
+    color: white;
+    
 }
 
+.homeForm {
+	position: relative; 
+	right:50px;
+	left: 50px; 
+	width:50%;
+    margin: auto; 
+    color: white;
+    text-align: left;
+    padding: 30px;
+} 
+
+.h1 {
+    text-align: center;
+    color: white;
+    
+}
+
+.blackJackTable {
+    background-image: url("Casino.jpeg");
+    height: 800px;
+    background-size: cover;
+    text-align: center;
+    
+
+}
+
+.layOut {
+    display: flex;
+    flex-direction: column;
+    align-content: stretch;
+    align-items: center;
+}
+
+.playerContainer {
+    display: flex;
+    justify-self: flex-start;
+    align-content: flex-start;
+
+}
+
+
+.playerOne{
+    display: flex;
+    justify-self: end;
+    
+}
+
+.Dealer {
+    display: flex;
+    justify-self: left;
+    
+}
+
+.cardImage {
+    display: flex;
+    align-content: space-around;
+   
+}
+
+
+.playingCardsContainer {
+    display: flex;
+    justify-content: space-evenly;
+    
+}
+
+.playingCards {
+    display: flex;
+    align-content: space-around;
+
+}
+
+.buttonsContainer{
+    display: flex;
+    align-content: flex-end;
+    justify-items: baseline;
+
+}
+
+.Buttons {
+    display: flex;
+    align-self: baseline;
+
+}
 
 
